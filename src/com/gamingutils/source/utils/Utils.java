@@ -10,11 +10,11 @@ import java.io.IOException;
  */
 public class Utils {
 
-	public static byte ByteToShortByte(byte input) {
+	public static byte ByteToGnaw(byte input) {
 		return (byte) ((input&0xf0) >> 1 | (input&0x0f));
 	}
 
-	public static byte ShortByteToByte(byte input) {
+	public static byte GnawToByte(byte input) {
 		return (byte) ((input&0x38) << 1 | (input&0x7));
 	}
 
@@ -22,8 +22,8 @@ public class Utils {
 		return hexCharacter((byte)((input&0xf0)>>4)) + "|" + hexCharacter((byte)(input&0x0f));
 	}
 
-	public static String ShortByteToHex(byte input) {
-		return ByteToHex(ShortByteToByte(input));
+	public static String GnawToHex(byte input) {
+		return ByteToHex(GnawToByte(input));
 	}
 
 	public static byte scanCharacterSetForCharacter(byte characterset, String character) {
@@ -36,10 +36,10 @@ public class Utils {
 		return -1;
 	}
 
-	public static int convertByteToNumber(byte r, byte b, byte g) {
-		int x = Utils.ShortByteToByte(r) << 16,
-			y = Utils.ShortByteToByte(b) << 8,
-			z = Utils.ShortByteToByte(g);
+	public static int convertGnawToNumber(byte r, byte b, byte g) {
+		int x = Utils.GnawToByte(r) << 16,
+			y = Utils.GnawToByte(b) << 8,
+			z = Utils.GnawToByte(g);
 
 		return x + y + z;
 	}

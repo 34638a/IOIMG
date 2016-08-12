@@ -14,7 +14,7 @@ public class Source {
 				" .!?\'\"-,:;()";
 		for (int i = 0; i < text.length(); i++) {
 			System.out.println(
-					Utils.ShortByteToHex(
+					Utils.GnawToHex(
 							Utils.scanCharacterSetForCharacter(
 									DecriptionTypes.characterset_English,
 									String.valueOf(text.charAt(i))
