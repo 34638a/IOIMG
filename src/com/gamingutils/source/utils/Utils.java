@@ -26,10 +26,10 @@ public class Utils {
 		return ByteToHex(GnawToByte(input));
 	}
 
-	public static byte scanCharacterSetForCharacter(byte characterset, String character) {
+	public static byte scanCharacterSetForCharacter(byte characterset, char character) {
 		String characters = DecriptionTypes.getCharacterSet(characterset);
 		for (byte i = 0; i < characters.length(); i++) {
-			if (character.equals(String.valueOf(characters.charAt(i)))) {
+			if (character == characters.charAt(i)) {
 				return i;
 			}
 		}
