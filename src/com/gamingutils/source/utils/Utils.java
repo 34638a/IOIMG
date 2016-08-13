@@ -11,11 +11,23 @@ import java.io.IOException;
 public class Utils {
 
 	public static byte ByteToGnaw(byte input) {
+		/*
+		System.out.println("0xff " + input);
+		System.out.println("0x38 " + ((input&0x38) << 1));
+		System.out.println("0x07 " + (input&0x07));
+		//*/
+
 		return (byte) ((input&0xf0) >> 1 | (input&0x0f));
 	}
 
 	public static byte GnawToByte(byte input) {
-		return (byte) ((input&0x38) << 1 | (input&0x7));
+		/*
+		System.out.println("0xff " + input);
+		System.out.println("0x38 " + ((input&0x38) << 1));
+		System.out.println("0x07 " + (input&0x07));
+		//*/
+
+		return (byte) (((input&0x38) << 1) |(input&0x07));
 	}
 
 	public static String ByteToHex(byte input) {

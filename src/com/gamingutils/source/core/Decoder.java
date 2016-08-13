@@ -50,7 +50,7 @@ public class Decoder {
 	public void filterData() {
 		System.out.println("Processing");
 		for (int i = 0; i < data.size(); i++) {
-			System.out.println("POS-READ " + i);
+			//System.out.println("POS-READ " + i);
 			processGnaw(data.get(i));
 		}
 	}
@@ -73,31 +73,31 @@ public class Decoder {
 						gnaws = new Gnaw[lengthOfRead];
 					}
 					lengthOfRead--;
-					System.out.println(lengthOfRead);
+					//System.out.println(lengthOfRead);
 					if (lengthOfRead != 0) {
 						gnaws[lengthOfRead] = gnaw;
 					} else if (lengthOfRead == 0) {
 						gnaws[lengthOfRead] = gnaw;
 						decodedStrings.add("TEST"); //Utils.convertGnawsToString(DecriptionTypes.characterset_English, gnaws));
-						System.out.println(decodedStrings.size());
+						//System.out.println(decodedStrings.size());
 						readType = -1;
 					}
 				}
 			} else if (readType == DecriptionTypes.pStringLength || readType == DecriptionTypes.pInt32) {
 				if (gnaws == null) {
-					gnaws = new Gnaw[7];
+					gnaws = new Gnaw[6];
 					lengthOfRead = new Integer(0);
 				}
 				gnaws[lengthOfRead] = gnaw;
-				System.out.println(gnaws[lengthOfRead].value);
+				//System.out.println(gnaws[lengthOfRead].value);
 				lengthOfRead++;
-				if (lengthOfRead == 7) {
+				if (lengthOfRead == gnaws.length) {
 					System.out.println("a " +lengthOfRead);
 					for (int i = 0; i < gnaws.length; i++) {
 						System.out.println(gnaws[i].value);
 					}
 					lengthOfRead = Utils.convertGnawsToInt32(gnaws);
-					System.out.println("b " +lengthOfRead);
+					//System.out.println("b " +lengthOfRead);
 					if (readType == DecriptionTypes.pStringLength) {
 						readType = DecriptionTypes.pString;
 					} else {

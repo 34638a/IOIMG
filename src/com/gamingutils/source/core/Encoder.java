@@ -57,7 +57,6 @@ public class Encoder {
 	public void encodeInt(int value) {
 		data.add(new Gnaw(DecriptionTypes.pInt32));
 		Gnaw[] vals = Utils.convertInt32ToGnaws(value);
-		System.out.println("VALS " + data.size());
 		for (int i = 0; i < vals.length; i++) {
 			System.out.println(vals[i].value);
 			data.add(vals[i]);
