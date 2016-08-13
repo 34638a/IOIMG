@@ -36,6 +36,14 @@ public class Utils {
 		return -1;
 	}
 
+	public static Gnaw[] getPixelToGnaw(int value) {
+		Gnaw[] g = new Gnaw[3];
+		g[0] = new Gnaw(ByteToGnaw((byte) ((value & 0x00ff0000)>> 16)));
+		g[1] = new Gnaw(ByteToGnaw((byte) ((value & 0x0000ff00) >> 8)));
+		g[2] = new Gnaw(ByteToGnaw((byte) (value & 0x000000ff)));
+		return g;
+	}
+
 	public static int convertGnawToPixelInt(byte r, byte b, byte g) {
 		int x = Utils.GnawToByte(r) << 16,
 			y = Utils.GnawToByte(b) << 8,
@@ -45,18 +53,26 @@ public class Utils {
 	}
 
 	public static Gnaw[] convertInt32ToGnaws(int value) {
-		byte hexMask = 0x3f;
-		Gnaw[] g = new Gnaw[7];
+		int hexMask1 = 0x3F;
+		int hexMask2 = 0xFC0;
+		int hexMask3 = 0x3F000;
+		int hexMask4 = 0xFC0000;
+		int hexMask5 = 0x3F000000;
+		int hexMask6 = 0xC0000000;
+		Gnaw[] g = new Gnaw[6];
 
-		g[0] = new Gnaw((byte) ((value >> 0) & hexMask));
-		g[1] = new Gnaw((byte) ((value >> 6) & hexMask));
-		g[2] = new Gnaw((byte) ((value >> 12) & hexMask));
-		g[3] = new Gnaw((byte) ((value >> 18) & hexMask));
-		g[4] = new Gnaw((byte) ((value >> 24) & hexMask));
-		g[5] = new Gnaw((byte) ((value >> 30) & hexMask));
-		g[6] = new Gnaw((byte) ((value >> 36) & hexMask));
+		g[0] = new Gnaw((byte) ((value & hexMask1) >> 0));
+		g[1] = new Gnaw((byte) ((value & hexMask2) >> 6));
+		g[2] = new Gnaw((byte) ((value & hexMask3) >> 12));
+		g[3] = new Gnaw((byte) ((value & hexMask4) >> 18));
+		g[4] = new Gnaw((byte) ((value & hexMask5) >> 24));
+		g[5] = new Gnaw((byte) ((value & hexMask6) >> 30));
 
 		return g;
+	}
+
+	public static int convertGnawsToInt32(Gnaw[] g) {
+		return ((g[0].value + (g[1].value << 6) + (g[2].value << 12) + (g[3].value << 18) + (g[4].value << 24) + (g[5].value << 30)));
 	}
 
 	public static String convertToStringCharacter(byte r, byte g, byte b) {
@@ -69,6 +85,14 @@ public class Utils {
 		str += String.valueOf(DecriptionTypes.getCharacterSet(characterset).charAt(g));
 		str += String.valueOf(DecriptionTypes.getCharacterSet(characterset).charAt(b));
 		return str;
+	}
+
+	public static String convertGnawsToString(byte characterset, Gnaw[] g) {
+		String val = "";
+		for (int i = g.length; i > -1; i--) {
+			val += String.valueOf(DecriptionTypes.getCharacterSet(characterset).charAt(g[i].value));
+		}
+		return val;
 	}
 
 	private static String hexCharacter(byte input) {
@@ -142,8 +166,7 @@ public class Utils {
 		File inFile = new File("./" + fileName + ".png");
 		try
 		{
-			BufferedImage image = ImageIO.read(inFile);
-			return image;
+			return ImageIO.read(inFile);
 		}
 		catch (IOException e)
 		{

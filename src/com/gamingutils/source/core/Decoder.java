@@ -1,6 +1,5 @@
 package com.gamingutils.source.core;
 
-
 import com.gamingutils.source.utils.DecriptionTypes;
 import com.gamingutils.source.utils.Gnaw;
 import com.gamingutils.source.utils.Utils;
@@ -11,108 +10,103 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Jordan Laptop on 9/08/2016.
+ * Created by Jordan Laptop on 13/08/2016.
  */
 public class Decoder {
 
-	//Decoder Rules:
-	//1. All images that are being decoded are to be interpreted as a RBG image with not A component
-	//2. Any Pixel that is completely Black #000000 is considered to be the end of a statement
-	//3. Images being decoded can hold a masking image that will be subtracted from the image first
-	//4. Before masking the total for all values must not exceed FF for a single colour total
-
-	private static BufferedImage MASK;
 	private static List<Gnaw> data = new ArrayList<>();
+	public List<String> decodedStrings;
+	public List<Integer> decodedInt;
 
-	public Decoder(BufferedImage mask) {
-		this.MASK = mask;
+	public Decoder() {
+		this.decodedStrings = new ArrayList<>();
+		this.decodedInt = new ArrayList<>();
 	}
 
-	public void stripImage(BufferedImage imageDecode, BufferedImage imageMask) {
+	public BufferedImage stripImage(BufferedImage imageDecode, BufferedImage imageMask) {
 		int[] imgToDecode = ((DataBufferInt) imageDecode.getRaster().getDataBuffer()).getData();
-		int[] imgAsMask = ((DataBufferInt) imageMask.getRaster().getDataBuffer()).getData();
 
 		for (int x = 0; x < imageDecode.getWidth(); x++) {
 			for (int y = 0; y < imageDecode.getHeight(); y++) {
-				imgToDecode[x + y*imageDecode.getWidth()] -= imgAsMask[x%imageMask.getWidth() + (y*imageDecode.getWidth())%imageMask.getHeight()];
+				imgToDecode[x + y*imageDecode.getWidth()] -= imageMask.getRGB(x%imageMask.getWidth(), y%imageMask.getHeight());
 			}
 		}
+		return imageDecode;
 	}
 
-	public void maskImage(BufferedImage imageDecode, BufferedImage imageMask) {
-		int[] imgToDecode = ((DataBufferInt) imageDecode.getRaster().getDataBuffer()).getData();
-		int[] imgAsMask = ((DataBufferInt) imageMask.getRaster().getDataBuffer()).getData();
-
-		for (int x = 0; x < imageDecode.getWidth(); x++) {
-			for (int y = 0; y < imageDecode.getHeight(); y++) {
-				imgToDecode[x + y*imageDecode.getWidth()] += imgAsMask[x%imageMask.getWidth() + (y*imageDecode.getWidth())%imageMask.getHeight()];
+	public void imageToData(BufferedImage dataImage, BufferedImage maskImage) {
+		BufferedImage dataStripped = stripImage(dataImage, maskImage);
+		for (int x = 0; x < dataStripped.getWidth(); x++) {
+			for (int y = 0; y < dataStripped.getWidth(); y++) {
+				Gnaw[] g = Utils.getPixelToGnaw(dataStripped.getRGB(x, y));
+				data.add(g[0]);
+				data.add(g[1]);
+				data.add(g[2]);
 			}
 		}
+		filterData();
 	}
 
-	public void dumpData() {
-		data.clear();
-	}
-
-	public boolean encodeString(String value) {
-		data.add(new Gnaw(DecriptionTypes.pString));
-		encodeInt(value.length());
-		for (int i = 0; i < value.length(); i++) {
-			data.add(new Gnaw(
-							Utils.scanCharacterSetForCharacter(
-									DecriptionTypes.characterset_English,
-									value.charAt(i)
-							)
-					)
-			);
-		}
-		return true;
-	}
-
-	public void encodeInt(int value) {
-		data.add(new Gnaw(DecriptionTypes.pInt32));
-		Gnaw[] vals = Utils.convertInt32ToGnaws(value);
-		for (int i = 0; i < vals.length; i++) {
-			data.add(vals[i]);
+	public void filterData() {
+		System.out.println("Processing");
+		for (int i = 0; i < data.size(); i++) {
+			System.out.println("POS-READ " + i);
+			processGnaw(data.get(i));
 		}
 	}
 
-	private void setNull() {
-		data.add(new Gnaw((byte) (0)));
-	}
+	public byte readType = -1;
+	public int lengthOfRead = -1;
+	private Gnaw[] gnaws;
 
-	private byte getDataPoint(int point) {
-		try {
-			return data.get(point).value;
-		} catch (Exception e) {
-			return 0;
-		}
-	}
+	public void processGnaw(Gnaw gnaw) {
+		//System.out.println("Data:\n\t" + "\n\t" + data.size() + "\n\tReadType: " + readType + "\n\tLength: " + lengthOfRead);
 
-	public void storeData(int columns, String dataName, BufferedImage maskImage) {
-		setNull();
-		if (columns < 1) {
-			columns = 1;
-		}
-		int width = MASK.getWidth()*columns,
-				pixels = ((data.size() + 3 - data.size()%3)/3),
-				frame = (MASK.getHeight()*width),
-				height = MASK.getHeight()*((pixels + frame - pixels%frame)/frame);
-		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-		int[] img = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-				int pos = x + y*width;
-				img[pos] = Utils.convertGnawToPixelInt(
-						getDataPoint(pos*3),
-						getDataPoint(pos*3 + 1),
-						getDataPoint(pos*3 + 2)
-				);
+		if (readType == -1) {
+			readType = gnaw.value;
+		} else {
+			if (readType == DecriptionTypes.pString) {
+				if (lengthOfRead == -1) {
+					readType = DecriptionTypes.pStringLength;
+				} else {
+					if (gnaws == null) {
+						gnaws = new Gnaw[lengthOfRead];
+					}
+					lengthOfRead--;
+					System.out.println(lengthOfRead);
+					if (lengthOfRead != 0) {
+						gnaws[lengthOfRead] = gnaw;
+					} else if (lengthOfRead == 0) {
+						gnaws[lengthOfRead] = gnaw;
+						decodedStrings.add("TEST"); //Utils.convertGnawsToString(DecriptionTypes.characterset_English, gnaws));
+						System.out.println(decodedStrings.size());
+						readType = -1;
+					}
+				}
+			} else if (readType == DecriptionTypes.pStringLength || readType == DecriptionTypes.pInt32) {
+				if (gnaws == null) {
+					gnaws = new Gnaw[7];
+					lengthOfRead = new Integer(0);
+				}
+				gnaws[lengthOfRead] = gnaw;
+				System.out.println(gnaws[lengthOfRead].value);
+				lengthOfRead++;
+				if (lengthOfRead == 7) {
+					System.out.println("a " +lengthOfRead);
+					for (int i = 0; i < gnaws.length; i++) {
+						System.out.println(gnaws[i].value);
+					}
+					lengthOfRead = Utils.convertGnawsToInt32(gnaws);
+					System.out.println("b " +lengthOfRead);
+					if (readType == DecriptionTypes.pStringLength) {
+						readType = DecriptionTypes.pString;
+					} else {
+						decodedInt.add(lengthOfRead);
+						readType = -1;
+					}
+					gnaws = null;
+				}
 			}
 		}
-		if (maskImage != null) {
-			maskImage(image, maskImage);
-		}
-		Utils.writeOutImage(image, dataName);
 	}
 }

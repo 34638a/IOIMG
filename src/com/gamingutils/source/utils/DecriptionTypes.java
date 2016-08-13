@@ -9,6 +9,7 @@ public class DecriptionTypes {
 	public static final byte pInt64 = 2;
 	public static final byte pLong = 2;
 	public static final byte pString = 3;
+	public static final byte pStringLength = 4;
 
 
 	//Character Sets
