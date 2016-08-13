@@ -36,12 +36,27 @@ public class Utils {
 		return -1;
 	}
 
-	public static int convertGnawToNumber(byte r, byte b, byte g) {
+	public static int convertGnawToPixelInt(byte r, byte b, byte g) {
 		int x = Utils.GnawToByte(r) << 16,
 			y = Utils.GnawToByte(b) << 8,
 			z = Utils.GnawToByte(g);
 
 		return x + y + z;
+	}
+
+	public static Gnaw[] convertInt32ToGnaws(int value) {
+		byte hexMask = 0x3f;
+		Gnaw[] g = new Gnaw[7];
+
+		g[0] = new Gnaw((byte) ((value >> 0) & hexMask));
+		g[1] = new Gnaw((byte) ((value >> 6) & hexMask));
+		g[2] = new Gnaw((byte) ((value >> 12) & hexMask));
+		g[3] = new Gnaw((byte) ((value >> 18) & hexMask));
+		g[4] = new Gnaw((byte) ((value >> 24) & hexMask));
+		g[5] = new Gnaw((byte) ((value >> 30) & hexMask));
+		g[6] = new Gnaw((byte) ((value >> 36) & hexMask));
+
+		return g;
 	}
 
 	public static String convertToStringCharacter(byte r, byte g, byte b) {
@@ -121,5 +136,20 @@ public class Utils {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static BufferedImage readInImage(String fileName) {
+		File inFile = new File("./" + fileName + ".png");
+		try
+		{
+			BufferedImage image = ImageIO.read(inFile);
+			return image;
+		}
+		catch (IOException e)
+		{
+			System.out.println("An Error Occurred for File Read at Path: " + inFile.getAbsolutePath());
+			e.printStackTrace();
+		}
+		return null;
 	}
 }
