@@ -61,7 +61,7 @@ public class Decoder {
 			data.add(new Gnaw(
 							Utils.scanCharacterSetForCharacter(
 									DecriptionTypes.characterset_English,
-									String.valueOf(value.charAt(i))
+									value.charAt(i)
 							)
 					)
 			);
