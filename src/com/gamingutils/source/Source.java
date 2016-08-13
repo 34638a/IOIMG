@@ -24,7 +24,7 @@ public class Source {
 					Utils.GnawToHex(
 							Utils.scanCharacterSetForCharacter(
 									DecriptionTypes.characterset_English,
-									String.valueOf(text.charAt(i))
+									text.charAt(i)
 							)
 					)
 			);
