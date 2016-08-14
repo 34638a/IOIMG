@@ -50,9 +50,9 @@ public class Utils {
 
 	public static Gnaw[] getPixelToGnaw(int value) {
 		Gnaw[] g = new Gnaw[3];
-		g[0] = new Gnaw(ByteToGnaw((byte) ((value & 0x00ff0000)>> 16)));
-		g[1] = new Gnaw(ByteToGnaw((byte) ((value & 0x0000ff00) >> 8)));
-		g[2] = new Gnaw(ByteToGnaw((byte) (value & 0x000000ff)));
+		g[0] = new Gnaw(ByteToGnaw((byte) ((value >> 16) & 0x0ff)));
+		g[1] = new Gnaw(ByteToGnaw((byte) ((value >> 8) & 0x0ff)));
+		g[2] = new Gnaw(ByteToGnaw((byte) ((value) & 0x0ff)));
 		return g;
 	}
 
@@ -60,8 +60,9 @@ public class Utils {
 		int x = Utils.GnawToByte(r) << 16,
 			y = Utils.GnawToByte(b) << 8,
 			z = Utils.GnawToByte(g);
-
-		return x + y + z;
+		int rgb = x + y + z;//= ((Utils.GnawToByte(r)&0x0ff)<<16)|((Utils.GnawToByte(g)&0x0ff)<<8)|(Utils.GnawToByte(b)&0x0ff);
+		//System.out.println("Pixel Int32: " + rgb);
+		return rgb;
 	}
 
 	public static Gnaw[] convertInt32ToGnaws(int value) {
@@ -101,8 +102,8 @@ public class Utils {
 
 	public static String convertGnawsToString(byte characterset, Gnaw[] g) {
 		String val = "";
-		for (int i = g.length; i > -1; i--) {
-			val += String.valueOf(DecriptionTypes.getCharacterSet(characterset).charAt(g[i].value));
+		for (int i = g.length; i > 0; i--) {
+			val += String.valueOf(DecriptionTypes.getCharacterSet(characterset).charAt(g[i - 1].value));
 		}
 		return val;
 	}

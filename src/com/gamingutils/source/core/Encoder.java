@@ -58,7 +58,7 @@ public class Encoder {
 		data.add(new Gnaw(DecriptionTypes.pInt32));
 		Gnaw[] vals = Utils.convertInt32ToGnaws(value);
 		for (int i = 0; i < vals.length; i++) {
-			System.out.println(vals[i].value);
+			//System.out.println(vals[i].value);
 			data.add(vals[i]);
 		}
 	}
@@ -69,8 +69,10 @@ public class Encoder {
 
 	private byte getDataPoint(int point) {
 		try {
+			//System.out.println(point + " | " + data.get(point).value);
 			return data.get(point).value;
 		} catch (Exception e) {
+			//System.out.println(point + " | " + "NULL POINT");
 			return 0;
 		}
 	}
@@ -80,6 +82,7 @@ public class Encoder {
 		if (columns < 1) {
 			columns = 1;
 		}
+		System.out.println("___________________\n\nData Points To Encode: " + data.size() + "\n\n___________________");
 		int width = maskImage.getWidth()*columns,
 				pixels = ((data.size() + 3 - data.size()%3)/3),
 				frame = (maskImage.getHeight()*width),
@@ -88,12 +91,14 @@ public class Encoder {
 		int[] img = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
-				int pos = x + y*width;
+				int pos = y + x*height;
 				img[pos] = Utils.convertGnawToPixelInt(
 						getDataPoint(pos*3),
 						getDataPoint(pos*3 + 1),
 						getDataPoint(pos*3 + 2)
+
 				);
+				//System.out.println("Pixel: " + x + ", " + y + "\n\t" + getDataPoint(pos*3) + " | " + getDataPoint(pos*3 + 1) + " | " + getDataPoint(pos*3 + 2) + "\n____________________");
 			}
 		}
 		return image;

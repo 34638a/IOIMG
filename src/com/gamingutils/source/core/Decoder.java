@@ -34,16 +34,29 @@ public class Decoder {
 		return imageDecode;
 	}
 
+	public void imageToData(BufferedImage dataImage) {
+		BufferedImage fakeMask = new BufferedImage(dataImage.getWidth(), dataImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+		imageToData(dataImage, fakeMask);
+	}
+
 	public void imageToData(BufferedImage dataImage, BufferedImage maskImage) {
 		BufferedImage dataStripped = stripImage(dataImage, maskImage);
-		for (int x = 0; x < dataStripped.getWidth(); x++) {
-			for (int y = 0; y < dataStripped.getWidth(); y++) {
+
+		for (int y = 0; y < dataStripped.getHeight(); y++) {
+			for (int x = 0; x < dataStripped.getWidth(); x++) {
 				Gnaw[] g = Utils.getPixelToGnaw(dataStripped.getRGB(x, y));
 				data.add(g[0]);
 				data.add(g[1]);
 				data.add(g[2]);
+				//System.out.println("Pixel Int32: " + dataStripped.getRGB(x, y));
+				//System.out.println("Pixel: " + x + ", " + y + "\n\t" + data.get(data.size() - 3).value + " | " + data.get(data.size() - 2).value + " | " + data.get(data.size() - 1).value + "\n____________________");
 			}
 		}
+
+		for (int i = 0; i < data.size(); i++) {
+			//System.out.println("Decoded Value: " + data.get(i).value);
+		}
+
 		filterData();
 	}
 
@@ -51,7 +64,9 @@ public class Decoder {
 		System.out.println("Processing");
 		for (int i = 0; i < data.size(); i++) {
 			//System.out.println("POS-READ " + i);
-			processGnaw(data.get(i));
+			if (!processGnaw(data.get(i))) {
+				break;
+			}
 		}
 	}
 
@@ -59,13 +74,15 @@ public class Decoder {
 	public int lengthOfRead = -1;
 	private Gnaw[] gnaws;
 
-	public void processGnaw(Gnaw gnaw) {
-		//System.out.println("Data:\n\t" + "\n\t" + data.size() + "\n\tReadType: " + readType + "\n\tLength: " + lengthOfRead);
-
-		if (readType == -1) {
+	public boolean processGnaw(Gnaw gnaw) {
+		//System.out.println("Out " + gnaw.value);
+		if (readType == 0) {
+			return false;
+		} else if (readType == -1) {
 			readType = gnaw.value;
 		} else {
 			if (readType == DecriptionTypes.pString) {
+				//System.out.println("a" + gnaw.value);
 				if (lengthOfRead == -1) {
 					readType = DecriptionTypes.pStringLength;
 				} else {
@@ -78,9 +95,12 @@ public class Decoder {
 						gnaws[lengthOfRead] = gnaw;
 					} else if (lengthOfRead == 0) {
 						gnaws[lengthOfRead] = gnaw;
-						decodedStrings.add("TEST"); //Utils.convertGnawsToString(DecriptionTypes.characterset_English, gnaws));
+						decodedStrings.add(Utils.convertGnawsToString(DecriptionTypes.characterset_English, gnaws));
 						//System.out.println(decodedStrings.size());
 						readType = -1;
+						lengthOfRead = -1;
+						gnaws = null;
+						System.out.println("Storing String");
 					}
 				}
 			} else if (readType == DecriptionTypes.pStringLength || readType == DecriptionTypes.pInt32) {
@@ -92,21 +112,21 @@ public class Decoder {
 				//System.out.println(gnaws[lengthOfRead].value);
 				lengthOfRead++;
 				if (lengthOfRead == gnaws.length) {
-					System.out.println("a " +lengthOfRead);
-					for (int i = 0; i < gnaws.length; i++) {
-						System.out.println(gnaws[i].value);
-					}
 					lengthOfRead = Utils.convertGnawsToInt32(gnaws);
 					//System.out.println("b " +lengthOfRead);
 					if (readType == DecriptionTypes.pStringLength) {
 						readType = DecriptionTypes.pString;
 					} else {
+						System.out.println("Storing Int");
 						decodedInt.add(lengthOfRead);
+						lengthOfRead = -1;
 						readType = -1;
 					}
 					gnaws = null;
 				}
 			}
 		}
+		//System.out.println("Data:\n\tValue: " + gnaw.value + "\n\tReadType: " + readType + "\n\tLength: " + lengthOfRead);
+		return true;
 	}
 }

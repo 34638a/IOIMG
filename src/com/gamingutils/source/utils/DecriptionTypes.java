@@ -18,12 +18,12 @@ public class DecriptionTypes {
 	public static String c_English =
 			"abcdefghijklmnopqrstuvwxyz" +
 			"ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-			" .!?\'\"-,:;()";
+			" .!?\'\n-,:;()";
 		//Numbers and Symbols
 	public static byte characterset_NumbersAndSymbols = 1;
 	public static String c_NumbersAndSymbols =
 			"1234567890@#$^&_~`-+*/%<>=" +
-			"{}[]\n\t                    " +
+			"{}[]\"\t                    " +
 			"            ";
 
 	public static String getCharacterSet(int value) {
