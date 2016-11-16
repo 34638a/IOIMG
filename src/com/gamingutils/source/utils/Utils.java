@@ -11,22 +11,10 @@ import java.io.IOException;
 public class Utils {
 
 	public static byte ByteToGnaw(byte input) {
-		/*
-		System.out.println("0xff " + input);
-		System.out.println("0x38 " + ((input&0x38) << 1));
-		System.out.println("0x07 " + (input&0x07));
-		//*/
-
 		return (byte) ((input&0xf0) >> 1 | (input&0x0f));
 	}
 
 	public static byte GnawToByte(byte input) {
-		/*
-		System.out.println("0xff " + input);
-		System.out.println("0x38 " + ((input&0x38) << 1));
-		System.out.println("0x07 " + (input&0x07));
-		//*/
-
 		return (byte) (((input&0x38) << 1) |(input&0x07));
 	}
 
@@ -60,9 +48,7 @@ public class Utils {
 		int x = Utils.GnawToByte(r) << 16,
 			y = Utils.GnawToByte(b) << 8,
 			z = Utils.GnawToByte(g);
-		int rgb = x + y + z;//= ((Utils.GnawToByte(r)&0x0ff)<<16)|((Utils.GnawToByte(g)&0x0ff)<<8)|(Utils.GnawToByte(b)&0x0ff);
-		//System.out.println("Pixel Int32: " + rgb);
-		return rgb;
+		return x + y + z;
 	}
 
 	public static Gnaw[] convertInt32ToGnaws(int value) {
@@ -74,7 +60,7 @@ public class Utils {
 		int hexMask6 = 0xC0000000;
 		Gnaw[] g = new Gnaw[6];
 
-		g[0] = new Gnaw((byte) ((value & hexMask1) >> 0));
+		g[0] = new Gnaw((byte) ((value & hexMask1)));
 		g[1] = new Gnaw((byte) ((value & hexMask2) >> 6));
 		g[2] = new Gnaw((byte) ((value & hexMask3) >> 12));
 		g[3] = new Gnaw((byte) ((value & hexMask4) >> 18));

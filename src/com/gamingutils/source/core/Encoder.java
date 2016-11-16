@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -18,7 +19,7 @@ public class Encoder {
 
 	//Encoder Rules:
 	//1. All images that are being decoded are to be interpreted as a RBG image with not A component
-	//2. Any Pixel that is completely Black #000000 is considered to be the end of a statement
+	//2. Any Pixel that is completely Black #000000 is considered to be the end of the script if there is not already a read in progress
 	//3. Images being decoded can hold a masking image that will be subtracted from the image first
 	//4. Before masking the total for all values must not exceed FF for a single colour total
 
@@ -57,10 +58,7 @@ public class Encoder {
 	public void encodeInt(int value) {
 		data.add(new Gnaw(DecriptionTypes.pInt32));
 		Gnaw[] vals = Utils.convertInt32ToGnaws(value);
-		for (int i = 0; i < vals.length; i++) {
-			//System.out.println(vals[i].value);
-			data.add(vals[i]);
-		}
+		Collections.addAll(data, vals);
 	}
 
 	private void setNull() {

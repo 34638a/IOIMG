@@ -52,11 +52,6 @@ public class Decoder {
 				//System.out.println("Pixel: " + x + ", " + y + "\n\t" + data.get(data.size() - 3).value + " | " + data.get(data.size() - 2).value + " | " + data.get(data.size() - 1).value + "\n____________________");
 			}
 		}
-
-		for (int i = 0; i < data.size(); i++) {
-			//System.out.println("Decoded Value: " + data.get(i).value);
-		}
-
 		filterData();
 	}
 
@@ -93,7 +88,7 @@ public class Decoder {
 					//System.out.println(lengthOfRead);
 					if (lengthOfRead != 0) {
 						gnaws[lengthOfRead] = gnaw;
-					} else if (lengthOfRead == 0) {
+					} else {
 						gnaws[lengthOfRead] = gnaw;
 						decodedStrings.add(Utils.convertGnawsToString(DecriptionTypes.characterset_English, gnaws));
 						//System.out.println(decodedStrings.size());
